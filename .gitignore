@@ -1,0 +1,29 @@
+# IntelliJ IDEA
+.idea/
+*.iml
+
+# Java / Maven
+**/target/
+
+# Environment variables / secrets
+.env
+.env.*
+!*.example
+
+# Logs
+*.log
+
+# React / Node
+**/node_modules/
+**/dist/
+
+# Python
+**/__pycache__/
+**/.venv/
+*.pyc
+
+# Windows
+Thumbs.db
+
+# macOS
+.DS_Store
