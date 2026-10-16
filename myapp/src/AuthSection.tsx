@@ -18,9 +18,10 @@ type AuthFormView = 'none' | 'login' | 'signup'
 
 type AuthSectionProps = {
   onLogoutSuccess: () => void
+  onAuthChange: (user: UserResponse | null) => void
 }
 
-export default function AuthSection({ onLogoutSuccess }: AuthSectionProps) {
+export default function AuthSection({ onLogoutSuccess, onAuthChange }: AuthSectionProps) {
   const [session, setSession] = useState<AuthSessionState>({ kind: 'loading' })
   const [formView, setFormView] = useState<AuthFormView>('none')
 
@@ -47,6 +48,16 @@ export default function AuthSection({ onLogoutSuccess }: AuthSectionProps) {
   useEffect(() => {
     void loadSession()
   }, [loadSession])
+
+  useEffect(() => {
+    if (session.kind === 'authenticated') {
+      onAuthChange(session.user)
+      return
+    }
+    if (session.kind === 'unauthenticated' || session.kind === 'server_error') {
+      onAuthChange(null)
+    }
+  }, [session, onAuthChange])
 
   function openLogin() {
     setFormView('login')
