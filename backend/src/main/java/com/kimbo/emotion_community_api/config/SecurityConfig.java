@@ -65,6 +65,8 @@ public class SecurityConfig {
 						.requestMatchers("/api/diaries", "/api/diaries/**").authenticated()
 						.requestMatchers(HttpMethod.GET, "/api/community/posts").permitAll()
 						.requestMatchers(HttpMethod.POST, "/api/community/posts").authenticated()
+						.requestMatchers(HttpMethod.PUT, "/api/community/posts/**").authenticated()
+						.requestMatchers(HttpMethod.DELETE, "/api/community/posts/**").authenticated()
 						.anyRequest().denyAll())
 				.exceptionHandling(ex -> ex
 						.authenticationEntryPoint((request, response, authException) -> response

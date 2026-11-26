@@ -11,6 +11,7 @@ import com.kimbo.emotion_community_api.dao.CommunityPostRepository;
 import com.kimbo.emotion_community_api.dao.UserRepository;
 import com.kimbo.emotion_community_api.dto.CommunityPostResponse;
 import com.kimbo.emotion_community_api.dto.CreateCommunityPostRequest;
+import com.kimbo.emotion_community_api.dto.UpdateCommunityPostRequest;
 import com.kimbo.emotion_community_api.entity.CommunityPost;
 import com.kimbo.emotion_community_api.entity.User;
 
@@ -45,6 +46,28 @@ public class CommunityPostService {
 		return communityPostRepository.findAllByOrderByCreatedAtDescIdDesc().stream()
 				.map(this::toResponse)
 				.toList();
+	}
+
+	@Transactional
+	public CommunityPostResponse update(long userId, long postId, UpdateCommunityPostRequest request) {
+		CommunityPost post = communityPostRepository.findByIdAndAuthor_Id(postId, userId)
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+		String title = request.title() == null ? "" : request.title().trim();
+		String body = request.body() == null ? "" : request.body().trim();
+		if (title.isEmpty() || body.isEmpty()) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Title and body must not be blank");
+		}
+
+		post.updateTitleAndBody(title, body);
+		return toResponse(post);
+	}
+
+	@Transactional
+	public void delete(long userId, long postId) {
+		CommunityPost post = communityPostRepository.findByIdAndAuthor_Id(postId, userId)
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+		communityPostRepository.delete(post);
 	}
 
 	private CommunityPostResponse toResponse(CommunityPost post) {

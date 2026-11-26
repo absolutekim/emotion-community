@@ -61,4 +61,9 @@ public class CommunityPost {
 	public Instant getCreatedAt() {
 		return createdAt;
 	}
+
+	public void updateTitleAndBody(String title, String body) {
+		this.title = title;
+		this.body = body;
+	}
 }

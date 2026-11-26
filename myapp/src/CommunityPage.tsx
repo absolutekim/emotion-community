@@ -1,17 +1,10 @@
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react'
 import { createCommunityPost, fetchCommunityPosts, type CommunityPostResponse } from './api/community.ts'
+import CommunityPostListSection from './CommunityPostListSection.tsx'
 import type { UserResponse } from './api/auth.ts'
 
 type CommunityPageProps = {
   authUser: UserResponse | null
-}
-
-function formatCreatedAt(iso: string): string {
-  const date = new Date(iso)
-  if (Number.isNaN(date.getTime())) {
-    return iso
-  }
-  return date.toLocaleString('ko-KR')
 }
 
 export default function CommunityPage({ authUser }: CommunityPageProps) {
@@ -25,6 +18,7 @@ export default function CommunityPage({ authUser }: CommunityPageProps) {
   const [formError, setFormError] = useState<string | null>(null)
 
   const listRevisionRef = useRef(0)
+  const listOwnerRef = useRef<number | null>(null)
 
   const loadPosts = useCallback(async () => {
     const revision = listRevisionRef.current
@@ -51,6 +45,7 @@ export default function CommunityPage({ authUser }: CommunityPageProps) {
   }, [loadPosts])
 
   useEffect(() => {
+    listOwnerRef.current = authUser?.id ?? null
     setTitle('')
     setBody('')
     setFormError(null)
@@ -104,17 +99,22 @@ export default function CommunityPage({ authUser }: CommunityPageProps) {
         {!listLoading && !listError && posts.length === 0 && (
           <p className="empty-state">아직 공개 글이 없습니다.</p>
         )}
-        <ul className="post-list">
-          {posts.map((post) => (
-            <li key={post.id} className="post-item">
-              <h3 className="post-title">{post.title}</h3>
-              <p className="post-meta">
-                {post.authorLoginId} · {formatCreatedAt(post.createdAt)}
-              </p>
-              <p className="post-body">{post.body}</p>
-            </li>
-          ))}
-        </ul>
+        {!listLoading && !listError && posts.length > 0 && (
+          <CommunityPostListSection
+            posts={posts}
+            authUser={authUser}
+            listOwnerRef={listOwnerRef}
+            onPostUpdated={(post) => {
+              setPosts((prev) => prev.map((item) => (item.id === post.id ? post : item)))
+            }}
+            onPostRemoved={(id) => {
+              setPosts((prev) => prev.filter((item) => item.id !== id))
+            }}
+            onAuthCleared={() => {
+              listOwnerRef.current = null
+            }}
+          />
+        )}
       </section>
 
       {authUser ? (

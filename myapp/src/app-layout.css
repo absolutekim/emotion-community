@@ -403,6 +403,10 @@ input.field {
   padding: 1.25rem 0;
 }
 
+.post-item__actions {
+  margin-top: 0.5rem;
+}
+
 .community-hint {
   margin: 1.25rem 0 0;
   padding: 0.85rem 1rem;
