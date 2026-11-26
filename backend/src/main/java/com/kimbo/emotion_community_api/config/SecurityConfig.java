@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -62,6 +63,8 @@ public class SecurityConfig {
 						.requestMatchers("/api/emotions/**").permitAll()
 						.requestMatchers("/api/auth/me", "/api/auth/logout").authenticated()
 						.requestMatchers("/api/diaries", "/api/diaries/**").authenticated()
+						.requestMatchers(HttpMethod.GET, "/api/community/posts").permitAll()
+						.requestMatchers(HttpMethod.POST, "/api/community/posts").authenticated()
 						.anyRequest().denyAll())
 				.exceptionHandling(ex -> ex
 						.authenticationEntryPoint((request, response, authException) -> response

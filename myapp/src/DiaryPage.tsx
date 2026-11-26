@@ -1,8 +1,12 @@
-import { useCallback, useRef, useState, type ChangeEvent, type FormEvent } from 'react'
-import AuthSection from './AuthSection.tsx'
+import { useCallback, useEffect, useRef, useState, type ChangeEvent, type FormEvent } from 'react'
 import { createDiary, fetchDiaries, type DiaryResponse } from './api/diaries.ts'
 import DiaryListSection from './DiaryListSection.tsx'
 import type { UserResponse } from './api/auth.ts'
+
+type DiaryPageProps = {
+  authUser: UserResponse | null
+  registerClear: (fn: () => void) => void
+}
 
 type AnalyzeEmotionRequest = {
   content: string
@@ -22,8 +26,7 @@ function parseEmotionFromResponse(data: unknown): string | null {
   return emotion
 }
 
-export default function DiaryPage() {
-  const [authUser, setAuthUser] = useState<UserResponse | null>(null)
+export default function DiaryPage({ authUser, registerClear }: DiaryPageProps) {
   const [diaries, setDiaries] = useState<DiaryResponse[]>([])
   const [listLoading, setListLoading] = useState(false)
 
@@ -65,17 +68,17 @@ export default function DiaryPage() {
     }
   }, [])
 
-  const handleAuthChange = useCallback(
-    (user: UserResponse | null) => {
-      listOwnerRef.current = user?.id ?? null
-      setAuthUser(user)
-      setDiaries([])
-      if (user) {
-        void loadDiariesForUser(user.id)
-      }
-    },
-    [loadDiariesForUser],
-  )
+  useEffect(() => {
+    registerClear(clearDiary)
+  }, [clearDiary, registerClear])
+
+  useEffect(() => {
+    listOwnerRef.current = authUser?.id ?? null
+    setDiaries([])
+    if (authUser) {
+      void loadDiariesForUser(authUser.id)
+    }
+  }, [authUser, loadDiariesForUser])
 
   const trimmed = content.trim()
   const busy = loading || saving
@@ -188,7 +191,6 @@ export default function DiaryPage() {
 
   return (
     <main style={{ maxWidth: '32rem', margin: '2rem auto', padding: '0 1rem' }}>
-      <AuthSection onLogoutSuccess={clearDiary} onAuthChange={handleAuthChange} />
       <h1>오늘의 일기</h1>
       <form onSubmit={handleSubmit}>
         <label htmlFor="diary-content">일기 내용</label>
