@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.kimbo.emotion_community_api.dto.AnalyzeEmotionRequest;
 import com.kimbo.emotion_community_api.dto.AnalyzeEmotionResponse;
+import com.kimbo.emotion_community_api.service.EmotionInferenceService;
 
 import jakarta.validation.Valid;
 
@@ -14,8 +15,14 @@ import jakarta.validation.Valid;
 @RequestMapping("/api/emotions")
 public class EmotionController {
 
+	private final EmotionInferenceService emotionInferenceService;
+
+	public EmotionController(EmotionInferenceService emotionInferenceService) {
+		this.emotionInferenceService = emotionInferenceService;
+	}
+
 	@PostMapping("/analyze")
 	public AnalyzeEmotionResponse analyze(@Valid @RequestBody AnalyzeEmotionRequest request) {
-		return new AnalyzeEmotionResponse("평온");
+		return emotionInferenceService.analyze(request.content().trim());
 	}
 }

@@ -63,7 +63,11 @@ export default function DiaryPage() {
       }
 
       if (!response.ok) {
-        setError('감정 분석에 실패했습니다. 다시 시도해 주세요.')
+        if (response.status === 503) {
+          setError('감정 분석 서버를 사용할 수 없습니다. 잠시 후 다시 시도해 주세요.')
+        } else {
+          setError('감정 분석에 실패했습니다. 다시 시도해 주세요.')
+        }
         return
       }
 
@@ -113,7 +117,7 @@ export default function DiaryPage() {
       )}
       {resultVisible && emotion && (
         <p aria-live="polite" style={{ marginTop: '1.5rem' }}>
-          대표 감정: {emotion} (예시)
+          대표 감정: {emotion}
         </p>
       )}
     </main>
