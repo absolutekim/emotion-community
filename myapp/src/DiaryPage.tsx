@@ -1,6 +1,7 @@
 import { useCallback, useRef, useState, type ChangeEvent, type FormEvent } from 'react'
 import AuthSection from './AuthSection.tsx'
 import { createDiary, fetchDiaries, type DiaryResponse } from './api/diaries.ts'
+import DiaryListSection from './DiaryListSection.tsx'
 import type { UserResponse } from './api/auth.ts'
 
 type AnalyzeEmotionRequest = {
@@ -19,14 +20,6 @@ function parseEmotionFromResponse(data: unknown): string | null {
     return null
   }
   return emotion
-}
-
-function formatCreatedAt(iso: string): string {
-  const date = new Date(iso)
-  if (Number.isNaN(date.getTime())) {
-    return iso
-  }
-  return date.toLocaleString('ko-KR')
 }
 
 export default function DiaryPage() {
@@ -229,30 +222,19 @@ export default function DiaryPage() {
       )}
 
       {authUser && (
-        <section style={{ marginTop: '2rem', textAlign: 'left' }}>
-          <h2>내 일기</h2>
-          {listLoading && <p>목록을 불러오는 중…</p>}
-          {!listLoading && diaries.length === 0 && <p>저장된 일기가 없습니다.</p>}
-          <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-            {diaries.map((entry) => (
-              <li
-                key={entry.id}
-                style={{
-                  borderTop: '1px solid var(--border)',
-                  padding: '1rem 0',
-                }}
-              >
-                <p style={{ marginBottom: '0.25rem', color: 'var(--text-h)' }}>
-                  <strong>{entry.emotion}</strong>
-                  <span style={{ marginLeft: '0.5rem', fontSize: '0.85rem' }}>
-                    {formatCreatedAt(entry.createdAt)}
-                  </span>
-                </p>
-                <p style={{ whiteSpace: 'pre-wrap' }}>{entry.content}</p>
-              </li>
-            ))}
-          </ul>
-        </section>
+        <DiaryListSection
+          key={authUser.id}
+          diaries={diaries}
+          listLoading={listLoading}
+          listOwnerRef={listOwnerRef}
+          onDiaryUpdated={(entry) => {
+            setDiaries((prev) => prev.map((item) => (item.id === entry.id ? entry : item)))
+          }}
+          onDiaryRemoved={(id) => {
+            setDiaries((prev) => prev.filter((item) => item.id !== id))
+          }}
+          onAuthCleared={clearDiary}
+        />
       )}
     </main>
   )

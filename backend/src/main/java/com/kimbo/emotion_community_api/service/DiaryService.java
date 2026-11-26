@@ -12,6 +12,7 @@ import com.kimbo.emotion_community_api.dao.UserRepository;
 import com.kimbo.emotion_community_api.dto.AnalyzeEmotionResponse;
 import com.kimbo.emotion_community_api.dto.CreateDiaryRequest;
 import com.kimbo.emotion_community_api.dto.DiaryResponse;
+import com.kimbo.emotion_community_api.dto.UpdateDiaryRequest;
 import com.kimbo.emotion_community_api.entity.Diary;
 import com.kimbo.emotion_community_api.entity.User;
 import com.kimbo.emotion_community_api.exception.EmotionInferenceUnavailableException;
@@ -59,6 +60,35 @@ public class DiaryService {
 		return diaryRepository.findByUser_IdOrderByCreatedAtDescIdDesc(userId).stream()
 				.map(this::toResponse)
 				.toList();
+	}
+
+	@Transactional
+	public DiaryResponse update(long userId, long diaryId, UpdateDiaryRequest request) {
+		Diary diary = diaryRepository.findByIdAndUser_Id(diaryId, userId)
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+		String content = request.content() == null ? "" : request.content().trim();
+		if (content.isEmpty()) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Content must not be blank");
+		}
+
+		AnalyzeEmotionResponse analyzed;
+		try {
+			analyzed = emotionInferenceService.analyze(content);
+		}
+		catch (EmotionInferenceUnavailableException ex) {
+			throw ex;
+		}
+
+		diary.updateContentAndEmotion(content, analyzed.emotion());
+		return toResponse(diary);
+	}
+
+	@Transactional
+	public void delete(long userId, long diaryId) {
+		Diary diary = diaryRepository.findByIdAndUser_Id(diaryId, userId)
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+		diaryRepository.delete(diary);
 	}
 
 	private DiaryResponse toResponse(Diary diary) {

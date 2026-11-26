@@ -7,14 +7,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kimbo.emotion_community_api.dto.CreateDiaryRequest;
 import com.kimbo.emotion_community_api.dto.DiaryResponse;
+import com.kimbo.emotion_community_api.dto.UpdateDiaryRequest;
 import com.kimbo.emotion_community_api.security.AppUserDetails;
 import com.kimbo.emotion_community_api.security.CsrfGuard;
 import com.kimbo.emotion_community_api.service.DiaryService;
@@ -45,6 +49,24 @@ public class DiaryController {
 	public List<DiaryResponse> list() {
 		long userId = currentUserId();
 		return diaryService.listForUser(userId);
+	}
+
+	@PutMapping("/{id}")
+	public DiaryResponse update(
+			@PathVariable long id,
+			@Valid @RequestBody UpdateDiaryRequest request,
+			HttpServletRequest httpRequest) {
+		CsrfGuard.requireMatchingHeader(httpRequest);
+		long userId = currentUserId();
+		return diaryService.update(userId, id, request);
+	}
+
+	@DeleteMapping("/{id}")
+	public ResponseEntity<Void> delete(@PathVariable long id, HttpServletRequest httpRequest) {
+		CsrfGuard.requireMatchingHeader(httpRequest);
+		long userId = currentUserId();
+		diaryService.delete(userId, id);
+		return ResponseEntity.noContent().build();
 	}
 
 	private long currentUserId() {

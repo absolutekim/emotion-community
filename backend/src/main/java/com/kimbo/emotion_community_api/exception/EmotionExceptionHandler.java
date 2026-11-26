@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestControllerAdvice
 public class EmotionExceptionHandler {
@@ -24,6 +25,11 @@ public class EmotionExceptionHandler {
 	public ResponseEntity<MapBody> handleBadCredentials(BadCredentialsException ex) {
 		return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
 				.body(new MapBody("Invalid login id or password"));
+	}
+
+	@ExceptionHandler(ResponseStatusException.class)
+	public ResponseEntity<Void> handleResponseStatus(ResponseStatusException ex) {
+		return ResponseEntity.status(ex.getStatusCode()).build();
 	}
 
 	private record MapBody(String message) {

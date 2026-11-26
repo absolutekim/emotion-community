@@ -61,4 +61,9 @@ public class Diary {
 	public Instant getCreatedAt() {
 		return createdAt;
 	}
+
+	public void updateContentAndEmotion(String content, String emotion) {
+		this.content = content;
+		this.emotion = emotion;
+	}
 }
