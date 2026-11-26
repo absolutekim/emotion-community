@@ -21,6 +21,9 @@
 **/__pycache__/
 **/.venv/
 *.pyc
+ai/.local-python/
+ai/.hf_cache/
+ai/install/
 
 # Windows
 Thumbs.db
