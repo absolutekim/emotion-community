@@ -1,4 +1,5 @@
-import { useRef, useState, type ChangeEvent, type FormEvent } from 'react'
+import { useCallback, useRef, useState, type ChangeEvent, type FormEvent } from 'react'
+import AuthSection from './AuthSection.tsx'
 
 type AnalyzeEmotionRequest = {
   content: string
@@ -26,6 +27,15 @@ export default function DiaryPage() {
   const [error, setError] = useState<string | null>(null)
 
   const contentRevisionRef = useRef(0)
+
+  const clearDiary = useCallback(() => {
+    setContent('')
+    setResultVisible(false)
+    setEmotion(null)
+    setError(null)
+    setLoading(false)
+    contentRevisionRef.current += 1
+  }, [])
 
   const trimmed = content.trim()
   const canSubmit = trimmed.length > 0 && !loading
@@ -96,6 +106,7 @@ export default function DiaryPage() {
 
   return (
     <main style={{ maxWidth: '32rem', margin: '2rem auto', padding: '0 1rem' }}>
+      <AuthSection onLogoutSuccess={clearDiary} />
       <h1>오늘의 일기</h1>
       <form onSubmit={handleSubmit}>
         <label htmlFor="diary-content">일기 내용</label>
