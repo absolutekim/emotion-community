@@ -61,6 +61,7 @@ public class SecurityConfig {
 						.requestMatchers("/api/auth/csrf", "/api/auth/signup", "/api/auth/login").permitAll()
 						.requestMatchers("/api/emotions/**").permitAll()
 						.requestMatchers("/api/auth/me", "/api/auth/logout").authenticated()
+						.requestMatchers("/api/diaries", "/api/diaries/**").authenticated()
 						.anyRequest().denyAll())
 				.exceptionHandling(ex -> ex
 						.authenticationEntryPoint((request, response, authException) -> response
