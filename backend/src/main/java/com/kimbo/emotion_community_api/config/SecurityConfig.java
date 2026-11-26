@@ -64,9 +64,12 @@ public class SecurityConfig {
 						.requestMatchers("/api/auth/me", "/api/auth/logout").authenticated()
 						.requestMatchers("/api/diaries", "/api/diaries/**").authenticated()
 						.requestMatchers(HttpMethod.GET, "/api/community/posts").permitAll()
+						.requestMatchers(HttpMethod.GET, "/api/community/posts/*/comments").permitAll()
 						.requestMatchers(HttpMethod.POST, "/api/community/posts").authenticated()
+						.requestMatchers(HttpMethod.POST, "/api/community/posts/*/comments").authenticated()
 						.requestMatchers(HttpMethod.PUT, "/api/community/posts/**").authenticated()
 						.requestMatchers(HttpMethod.DELETE, "/api/community/posts/**").authenticated()
+						.requestMatchers(HttpMethod.DELETE, "/api/community/comments/**").authenticated()
 						.anyRequest().denyAll())
 				.exceptionHandling(ex -> ex
 						.authenticationEntryPoint((request, response, authException) -> response

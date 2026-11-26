@@ -118,6 +118,87 @@ export async function updateCommunityPost(
   }
 }
 
+export type CommunityPostCommentResponse = {
+  id: number
+  postId: number
+  body: string
+  authorLoginId: string
+  createdAt: string
+}
+
+export async function fetchCommunityPostComments(
+  postId: number,
+): Promise<CommunityPostCommentResponse[]> {
+  const response = await fetch(`/api/community/posts/${postId}/comments`, { credentials })
+  if (!response.ok) {
+    throw new Error('community-comments-failed')
+  }
+  return (await response.json()) as CommunityPostCommentResponse[]
+}
+
+export type CreateCommunityPostCommentResult =
+  | { ok: true; data: CommunityPostCommentResponse }
+  | MutationFailure
+
+export async function createCommunityPostComment(
+  postId: number,
+  body: string,
+): Promise<CreateCommunityPostCommentResult> {
+  try {
+    const csrf = await fetchCsrf()
+    const response = await fetch(`/api/community/posts/${postId}/comments`, {
+      method: 'POST',
+      credentials,
+      headers: {
+        'Content-Type': 'application/json',
+        [csrf.headerName]: csrf.token,
+      },
+      body: JSON.stringify({ body }),
+    })
+    if (response.status === 201) {
+      return { ok: true, data: (await response.json()) as CommunityPostCommentResponse }
+    }
+    const message = await readErrorMessage(response)
+    if (response.status === 400) {
+      return { ok: false, status: 400, message: '댓글 내용을 입력해 주세요.' }
+    }
+    if (response.status === 404) {
+      return { ok: false, status: 404, message: '게시글을 찾을 수 없습니다.' }
+    }
+    return { ok: false, status: response.status, message: message ?? '댓글 작성에 실패했습니다.' }
+  } catch {
+    return { ok: false, status: 0, message: '서버에 연결할 수 없습니다.' }
+  }
+}
+
+export type DeleteCommunityPostCommentResult = { ok: true } | MutationFailure
+
+export async function deleteCommunityPostComment(
+  commentId: number,
+): Promise<DeleteCommunityPostCommentResult> {
+  try {
+    const csrf = await fetchCsrf()
+    const response = await fetch(`/api/community/comments/${commentId}`, {
+      method: 'DELETE',
+      credentials,
+      headers: {
+        'Content-Type': 'application/json',
+        [csrf.headerName]: csrf.token,
+      },
+    })
+    if (response.status === 204) {
+      return { ok: true }
+    }
+    const message = await readErrorMessage(response)
+    if (response.status === 404) {
+      return { ok: false, status: 404, message: '댓글을 찾을 수 없습니다.' }
+    }
+    return { ok: false, status: response.status, message: message ?? '댓글 삭제에 실패했습니다.' }
+  } catch {
+    return { ok: false, status: 0, message: '서버에 연결할 수 없습니다.' }
+  }
+}
+
 export async function deleteCommunityPost(id: number): Promise<DeleteCommunityPostResult> {
   try {
     const csrf = await fetchCsrf()

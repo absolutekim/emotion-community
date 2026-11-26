@@ -407,6 +407,59 @@ input.field {
   margin-top: 0.5rem;
 }
 
+.post-comments {
+  margin-top: 0.75rem;
+  padding: 0.85rem 1rem;
+  background: var(--ec-surface);
+  border: 1px solid var(--ec-border);
+  border-radius: var(--ec-radius);
+}
+
+.post-comments__status,
+.post-comments__empty {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--ec-text-muted);
+}
+
+.post-comments__list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 0.75rem;
+}
+
+.post-comments__item {
+  padding: 0.65rem 0;
+  border-top: 1px solid var(--ec-border);
+}
+
+.post-comments__item:first-child {
+  border-top: none;
+  padding-top: 0;
+}
+
+.post-comments__meta {
+  font-size: 0.82rem;
+  color: var(--ec-text-muted);
+  margin: 0 0 0.25rem;
+}
+
+.post-comments__body {
+  margin: 0 0 0.35rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.5;
+  font-size: 0.95rem;
+}
+
+.post-comments__form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  border-top: 1px solid var(--ec-border);
+  padding-top: 0.75rem;
+}
+
 .community-hint {
   margin: 1.25rem 0 0;
   padding: 0.85rem 1rem;
