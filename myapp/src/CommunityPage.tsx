@@ -90,14 +90,42 @@ export default function CommunityPage({ authUser }: CommunityPageProps) {
   }
 
   return (
-    <main style={{ maxWidth: '32rem', margin: '2rem auto', padding: '0 1rem' }}>
-      <h1>커뮤니티</h1>
+    <main className="app-main-inner">
+      <h1 className="page-title">커뮤니티</h1>
+
+      <section className="card community-feed">
+        <h2 className="section-title">공개 글</h2>
+        {listLoading && <p className="status-muted">목록을 불러오는 중…</p>}
+        {listError && (
+          <p className="alert alert--error" role="alert">
+            {listError}
+          </p>
+        )}
+        {!listLoading && !listError && posts.length === 0 && (
+          <p className="empty-state">아직 공개 글이 없습니다.</p>
+        )}
+        <ul className="post-list">
+          {posts.map((post) => (
+            <li key={post.id} className="post-item">
+              <h3 className="post-title">{post.title}</h3>
+              <p className="post-meta">
+                {post.authorLoginId} · {formatCreatedAt(post.createdAt)}
+              </p>
+              <p className="post-body">{post.body}</p>
+            </li>
+          ))}
+        </ul>
+      </section>
 
       {authUser ? (
-        <form onSubmit={(e) => void handleSubmit(e)} style={{ textAlign: 'left', marginBottom: '2rem' }}>
-          <label htmlFor="community-title">제목</label>
+        <form className="card card--composer" onSubmit={(e) => void handleSubmit(e)}>
+          <h2 className="section-title">글 올리기</h2>
+          <label className="field-label" htmlFor="community-title">
+            제목
+          </label>
           <input
             id="community-title"
+            className="field"
             type="text"
             maxLength={200}
             value={title}
@@ -106,11 +134,13 @@ export default function CommunityPage({ authUser }: CommunityPageProps) {
               setFormError(null)
             }}
             disabled={submitting}
-            style={{ display: 'block', width: '100%', marginBottom: '0.75rem' }}
           />
-          <label htmlFor="community-body">본문</label>
+          <label className="field-label" htmlFor="community-body">
+            본문
+          </label>
           <textarea
             id="community-body"
+            className="field"
             value={body}
             onChange={(e) => {
               setBody(e.target.value)
@@ -118,47 +148,21 @@ export default function CommunityPage({ authUser }: CommunityPageProps) {
             }}
             rows={6}
             disabled={submitting}
-            style={{ display: 'block', width: '100%', marginBottom: '0.75rem' }}
           />
           {formError && (
-            <p role="alert" style={{ color: 'crimson' }}>
+            <p className="alert alert--error" role="alert">
               {formError}
             </p>
           )}
-          <button type="submit" disabled={submitting || !title.trim() || !body.trim()}>
-            {submitting ? '올리는 중…' : '공개 글 올리기'}
-          </button>
+          <div className="btn-row">
+            <button type="submit" className="btn btn-primary" disabled={submitting || !title.trim() || !body.trim()}>
+              {submitting ? '올리는 중…' : '공개 글 올리기'}
+            </button>
+          </div>
         </form>
       ) : (
-        <p style={{ marginBottom: '2rem' }}>공개 글을 올리려면 로그인해 주세요.</p>
+        <p className="community-hint">공개 글을 올리려면 로그인해 주세요.</p>
       )}
-
-      <section style={{ textAlign: 'left' }}>
-        <h2>공개 글</h2>
-        {listLoading && <p>목록을 불러오는 중…</p>}
-        {listError && (
-          <p role="alert" style={{ color: 'crimson' }}>
-            {listError}
-          </p>
-        )}
-        {!listLoading && !listError && posts.length === 0 && <p>아직 공개 글이 없습니다.</p>}
-        <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-          {posts.map((post) => (
-            <li
-              key={post.id}
-              style={{ borderTop: '1px solid var(--border)', padding: '1rem 0' }}
-            >
-              <p style={{ marginBottom: '0.25rem', color: 'var(--text-h)' }}>
-                <strong>{post.title}</strong>
-                <span style={{ marginLeft: '0.5rem', fontSize: '0.85rem' }}>
-                  {post.authorLoginId} · {formatCreatedAt(post.createdAt)}
-                </span>
-              </p>
-              <p style={{ whiteSpace: 'pre-wrap' }}>{post.body}</p>
-            </li>
-          ))}
-        </ul>
-      </section>
     </main>
   )
 }

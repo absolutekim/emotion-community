@@ -112,35 +112,36 @@ export default function DiaryListSection({
   }
 
   return (
-    <section style={{ marginTop: '2rem', textAlign: 'left' }}>
-      <h2>내 일기</h2>
+    <section className="card">
+      <h2 className="section-title">저장한 일기</h2>
       {editError && editingId === null && (
-        <p role="alert" style={{ color: 'crimson' }}>
+        <p className="alert alert--error" role="alert">
           {editError}
         </p>
       )}
-      {listLoading && <p>목록을 불러오는 중…</p>}
-      {!listLoading && diaries.length === 0 && <p>저장된 일기가 없습니다.</p>}
-      <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+      {listLoading && <p className="status-muted">목록을 불러오는 중…</p>}
+      {!listLoading && diaries.length === 0 && (
+        <p className="empty-state">저장된 일기가 없습니다.</p>
+      )}
+      <ul className="diary-list">
         {diaries.map((entry) => (
-          <li
-            key={entry.id}
-            style={{
-              borderTop: '1px solid var(--border)',
-              padding: '1rem 0',
-            }}
-          >
-            <p style={{ marginBottom: '0.25rem', color: 'var(--text-h)' }}>
-              <strong>{editingId === entry.id ? '편집 중' : entry.emotion}</strong>
-              <span style={{ marginLeft: '0.5rem', fontSize: '0.85rem' }}>
+          <li key={entry.id} className="diary-item">
+            <div className="item-meta">
+              {editingId === entry.id ? (
+                <span className="emotion-badge">편집 중</span>
+              ) : (
+                <span className="emotion-badge">{entry.emotion}</span>
+              )}
+              <time className="item-date" dateTime={entry.createdAt}>
                 {formatCreatedAt(entry.createdAt)}
-              </span>
-            </p>
+              </time>
+            </div>
 
             {editingId === entry.id ? (
               <>
                 <textarea
                   id={`edit-${entry.id}`}
+                  className="field"
                   aria-label="일기 본문 수정"
                   value={editContent}
                   onChange={(event: ChangeEvent<HTMLTextAreaElement>) => {
@@ -149,32 +150,33 @@ export default function DiaryListSection({
                   }}
                   rows={6}
                   disabled={editSaving}
-                  style={{ display: 'block', width: '100%', marginBottom: '0.5rem' }}
                 />
                 {editError && (
-                  <p role="alert" style={{ color: 'crimson', fontSize: '0.9rem' }}>
+                  <p className="alert alert--error" role="alert">
                     {editError}
                   </p>
                 )}
-                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <div className="btn-row btn-row--start">
                   <button
                     type="button"
+                    className="btn btn-primary"
                     onClick={() => void handleEditSave(entry.id)}
                     disabled={editSaving || editContent.trim().length === 0}
                   >
                     {editSaving ? '저장 중…' : '저장'}
                   </button>
-                  <button type="button" onClick={cancelEdit} disabled={editSaving}>
+                  <button type="button" className="btn btn-secondary" onClick={cancelEdit} disabled={editSaving}>
                     취소
                   </button>
                 </div>
               </>
             ) : (
               <>
-                <p style={{ whiteSpace: 'pre-wrap' }}>{entry.content}</p>
-                <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
+                <p className="item-body">{entry.content}</p>
+                <div className="btn-row btn-row--start">
                   <button
                     type="button"
+                    className="btn btn-secondary"
                     onClick={() => startEdit(entry)}
                     disabled={deletingId !== null || editingId !== null}
                   >
@@ -182,6 +184,7 @@ export default function DiaryListSection({
                   </button>
                   <button
                     type="button"
+                    className="btn btn-ghost"
                     onClick={() => void handleDelete(entry.id)}
                     disabled={deletingId === entry.id || editingId !== null}
                   >

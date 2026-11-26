@@ -179,110 +179,104 @@ export default function AuthSection({ onLogoutSuccess, onAuthChange }: AuthSecti
     setFormError(result.message ?? '로그아웃에 실패했습니다.')
   }
 
-  const navStyle = {
-    display: 'flex',
-    flexWrap: 'wrap' as const,
-    gap: '0.75rem',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: '1.5rem',
-  }
-
   if (session.kind === 'loading') {
-    return (
-      <nav style={navStyle} aria-busy="true">
-        <span>계정 확인 중…</span>
-      </nav>
-    )
+    return <span className="status-muted" aria-busy="true">계정 확인 중…</span>
   }
 
   if (session.kind === 'server_error') {
     return (
-      <nav style={navStyle}>
-        <p role="alert" style={{ color: 'crimson', margin: 0 }}>
+      <>
+        <p className="alert alert--error" role="alert">
           인증 서버에 연결할 수 없습니다.
         </p>
-        <button type="button" onClick={() => void loadSession()}>
+        <button type="button" className="btn btn-ghost" onClick={() => void loadSession()}>
           다시 시도
         </button>
-      </nav>
+      </>
     )
   }
 
   return (
-    <section style={{ marginBottom: '1.5rem' }}>
-      <nav style={navStyle}>
+    <>
+      <div className="app-header__auth-inner">
         {session.kind === 'authenticated' ? (
           <>
             <span>
-              로그인: <strong>{session.user.loginId}</strong>
+              <span className="status-muted">로그인 </span>
+              <span className="auth-user">{session.user.loginId}</span>
             </span>
-            <button type="button" onClick={() => void handleLogout()} disabled={logoutSubmitting}>
+            <button
+              type="button"
+              className="btn btn-ghost"
+              onClick={() => void handleLogout()}
+              disabled={logoutSubmitting}
+            >
               {logoutSubmitting ? '로그아웃 중…' : '로그아웃'}
             </button>
           </>
         ) : (
           <>
-            <button type="button" onClick={openLogin}>
+            <button type="button" className="btn btn-ghost" onClick={openLogin}>
               로그인
             </button>
-            <button type="button" onClick={openSignup}>
+            <button type="button" className="btn btn-ghost" onClick={openSignup}>
               회원가입
             </button>
           </>
         )}
-      </nav>
 
-      {formError && session.kind === 'authenticated' && (
-        <p role="alert" style={{ color: 'crimson' }}>
-          {formError}
-        </p>
-      )}
+        {formError && session.kind === 'authenticated' && (
+          <p className="alert alert--error" role="alert">
+            {formError}
+          </p>
+        )}
+      </div>
 
       {formView === 'login' && session.kind !== 'authenticated' && (
-        <form
-          onSubmit={(e) => void handleLoginSubmit(e)}
-          style={{ maxWidth: '20rem', margin: '0 auto 1rem', textAlign: 'left' }}
-        >
-          <h2 style={{ textAlign: 'center' }}>로그인</h2>
+        <form className="auth-panel" onSubmit={(e) => void handleLoginSubmit(e)}>
+          <h2 className="auth-panel__title">로그인</h2>
           {formNotice && (
-            <p role="status" style={{ color: 'var(--text-h)' }}>
+            <p className="status-muted" role="status">
               {formNotice}
             </p>
           )}
-          <label htmlFor="auth-login-id">아이디</label>
+          <label className="field-label" htmlFor="auth-login-id">
+            아이디
+          </label>
           <input
             id="auth-login-id"
+            className="field"
             type="text"
             autoComplete="username"
             maxLength={64}
             value={loginId}
             onChange={(e) => setLoginId(e.target.value)}
-            style={{ display: 'block', width: '100%', marginBottom: '0.5rem' }}
             disabled={submitting}
           />
           {fieldErrors.loginId && (
-            <p role="alert" style={{ color: 'crimson', fontSize: '0.9rem' }}>
+            <p className="alert alert--error" role="alert">
               {fieldErrors.loginId}
             </p>
           )}
-          <label htmlFor="auth-login-password">비밀번호</label>
+          <label className="field-label" htmlFor="auth-login-password">
+            비밀번호
+          </label>
           <input
             id="auth-login-password"
+            className="field"
             type="password"
             autoComplete="current-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            style={{ display: 'block', width: '100%', marginBottom: '0.75rem' }}
             disabled={submitting}
           />
           {fieldErrors.password && (
-            <p role="alert" style={{ color: 'crimson', fontSize: '0.9rem' }}>
+            <p className="alert alert--error" role="alert">
               {fieldErrors.password}
             </p>
           )}
           {formError && (
-            <p role="alert" style={{ color: 'crimson' }}>
+            <p className="alert alert--error" role="alert">
               {formError}
             </p>
           )}
@@ -291,52 +285,53 @@ export default function AuthSection({ onLogoutSuccess, onAuthChange }: AuthSecti
       )}
 
       {formView === 'signup' && session.kind !== 'authenticated' && (
-        <form
-          onSubmit={(e) => void handleSignupSubmit(e)}
-          style={{ maxWidth: '20rem', margin: '0 auto 1rem', textAlign: 'left' }}
-        >
-          <h2 style={{ textAlign: 'center' }}>회원가입</h2>
-          <label htmlFor="auth-signup-id">아이디 (1–64자)</label>
+        <form className="auth-panel" onSubmit={(e) => void handleSignupSubmit(e)}>
+          <h2 className="auth-panel__title">회원가입</h2>
+          <label className="field-label" htmlFor="auth-signup-id">
+            아이디 (1–64자)
+          </label>
           <input
             id="auth-signup-id"
+            className="field"
             type="text"
             autoComplete="username"
             maxLength={64}
             value={loginId}
             onChange={(e) => setLoginId(e.target.value)}
-            style={{ display: 'block', width: '100%', marginBottom: '0.5rem' }}
             disabled={submitting}
           />
           {fieldErrors.loginId && (
-            <p role="alert" style={{ color: 'crimson', fontSize: '0.9rem' }}>
+            <p className="alert alert--error" role="alert">
               {fieldErrors.loginId}
             </p>
           )}
-          <label htmlFor="auth-signup-password">비밀번호 (8–72자)</label>
+          <label className="field-label" htmlFor="auth-signup-password">
+            비밀번호 (8–72자)
+          </label>
           <input
             id="auth-signup-password"
+            className="field"
             type="password"
             autoComplete="new-password"
             maxLength={72}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            style={{ display: 'block', width: '100%', marginBottom: '0.75rem' }}
             disabled={submitting}
           />
           {fieldErrors.password && (
-            <p role="alert" style={{ color: 'crimson', fontSize: '0.9rem' }}>
+            <p className="alert alert--error" role="alert">
               {fieldErrors.password}
             </p>
           )}
           {formError && (
-            <p role="alert" style={{ color: 'crimson' }}>
+            <p className="alert alert--error" role="alert">
               {formError}
             </p>
           )}
           <FormActionButtons submitting={submitting} onCancel={closeForm} submitLabel="가입하기" />
         </form>
       )}
-    </section>
+    </>
   )
 }
 
@@ -350,11 +345,11 @@ function FormActionButtons({
   submitLabel: string
 }) {
   return (
-    <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center', marginTop: '0.5rem' }}>
-      <button type="submit" disabled={submitting}>
+    <div className="btn-row">
+      <button type="submit" className="btn btn-primary" disabled={submitting}>
         {submitting ? '처리 중…' : submitLabel}
       </button>
-      <button type="button" onClick={onCancel} disabled={submitting}>
+      <button type="button" className="btn btn-secondary" onClick={onCancel} disabled={submitting}>
         닫기
       </button>
     </div>

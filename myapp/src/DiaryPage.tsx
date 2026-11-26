@@ -190,38 +190,55 @@ export default function DiaryPage({ authUser, registerClear }: DiaryPageProps) {
   }
 
   return (
-    <main style={{ maxWidth: '32rem', margin: '2rem auto', padding: '0 1rem' }}>
-      <h1>오늘의 일기</h1>
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="diary-content">일기 내용</label>
-        <textarea
-          id="diary-content"
-          value={content}
-          onChange={handleContentChange}
-          rows={8}
-          style={{ display: 'block', width: '100%', marginTop: '0.5rem', marginBottom: '1rem' }}
-        />
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', justifyContent: 'center' }}>
-          <button type="submit" disabled={!canAnalyze}>
-            {loading ? '분석 중…' : '대표 감정 확인'}
-          </button>
-          {authUser && (
-            <button type="button" onClick={() => void handleSave()} disabled={!canSave}>
-              {saving ? '저장 중…' : '분석하고 저장'}
-            </button>
+    <main className="app-main-inner">
+      <h1 className="page-title">일기 쓰기</h1>
+      <div className="card card--composer">
+        <form onSubmit={handleSubmit}>
+          <label className="field-label" htmlFor="diary-content">
+            일기 내용
+          </label>
+          <textarea
+            id="diary-content"
+            className="field"
+            value={content}
+            onChange={handleContentChange}
+            rows={8}
+            placeholder="오늘 있었던 일을 편하게 적어 보세요."
+          />
+          {resultVisible && emotion && (
+            <p className="emotion-result" aria-live="polite">
+              대표 감정: {emotion}
+            </p>
           )}
-        </div>
-      </form>
-      {error && (
-        <p role="alert" style={{ marginTop: '1rem', color: 'crimson' }}>
-          {error}
-        </p>
-      )}
-      {resultVisible && emotion && (
-        <p aria-live="polite" style={{ marginTop: '1.5rem' }}>
-          대표 감정: {emotion}
-        </p>
-      )}
+          {error && (
+            <p className="alert alert--error" role="alert">
+              {error}
+            </p>
+          )}
+          {authUser && (
+            <p className="composer-hint status-muted">
+              <strong className="composer-hint__label">대표 감정 확인</strong>은 저장 없이 미리보기,
+              <strong className="composer-hint__label"> 분석하고 저장</strong>은 내 일기에 남겨요.
+            </p>
+          )}
+          <div className="btn-row">
+            {authUser ? (
+              <>
+                <button type="button" className="btn btn-primary" onClick={() => void handleSave()} disabled={!canSave}>
+                  {saving ? '저장 중…' : '분석하고 저장'}
+                </button>
+                <button type="submit" className="btn btn-secondary" disabled={!canAnalyze}>
+                  {loading ? '분석 중…' : '대표 감정 확인'}
+                </button>
+              </>
+            ) : (
+              <button type="submit" className="btn btn-primary" disabled={!canAnalyze}>
+                {loading ? '분석 중…' : '대표 감정 확인'}
+              </button>
+            )}
+          </div>
+        </form>
+      </div>
 
       {authUser && (
         <DiaryListSection
